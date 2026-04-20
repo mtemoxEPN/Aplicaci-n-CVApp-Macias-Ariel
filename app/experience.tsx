@@ -7,33 +7,37 @@ import { useCVContext } from "../context/CVContext";
 import { Experience } from "../types/cv.types";
 import { colors, spacing, borderRadius, fontSize, fontWeight, shadows } from "../src/theme";
 
-// 🟢 1. IMPORTAMOS LAS HERRAMIENTAS NUEVAS
-import { useForm, Controller } from "react-hook-form";
-import { DatePickerField } from "../components/DatePickerField"; // Nuestro calendario
+// 🟢 1. Se importa la herramienta principal de TanStack Form en lugar de React Hook Form.
+import { useForm } from "@tanstack/react-form";
+import { DatePickerField } from "../components/DatePickerField";
+
+type ExperienceFormValues = Omit<Experience, "id">;
 
 export default function ExperienceScreen() {
   const router = useRouter();
   const { cvData, addExperience, deleteExperience } = useCVContext();
 
-  // 🟢 2. CONFIGURAMOS EL FORMULARIO (Eliminamos el viejo useState)
-  const { control, handleSubmit, formState: { errors }, reset } = useForm<Omit<Experience, "id">>({
+  // 🟢 2. CONFIGURAMOS EL FORMULARIO con TanStack Form
+  const form = useForm<ExperienceFormValues>({
     defaultValues: {
-      company: "", position: "", startDate: "", endDate: "", description: ""
-    }
+      company: "",
+      position: "",
+      startDate: "",
+      endDate: "",
+      description: ""
+    },
+    onSubmit: async ({ value }) => {
+      const newExperience: Experience = {
+        id: Date.now().toString(),
+        ...value,
+      };
+      addExperience(newExperience);
+      
+      // Limpiamos el formulario para agregar otra
+      form.reset({ company: "", position: "", startDate: "", endDate: "", description: "" });
+      Alert.alert("Éxito", "Experiencia agregada correctamente");
+    },
   });
-
-  // 🟢 3. GUARDAR EXPERIENCIA (React Hook Form ya verificó que no hay errores)
-  const onSubmit = (data: Omit<Experience, "id">) => {
-    const newExperience: Experience = {
-      id: Date.now().toString(),
-      ...data,
-    };
-    addExperience(newExperience);
-    
-    // Limpiamos el formulario para agregar otra
-    reset({ company: "", position: "", startDate: "", endDate: "", description: "" });
-    Alert.alert("Éxito", "Experiencia agregada correctamente");
-  };
 
   const handleDelete = (id: string) => {
     Alert.alert("Confirmar", "¿Estás seguro de eliminar esta experiencia?", [
@@ -47,92 +51,90 @@ export default function ExperienceScreen() {
       <View style={styles.content}>
         <Text style={styles.sectionTitle}>Agregar Nueva Experiencia</Text>
 
-        {/* 🟢 INPUT DE EMPRESA */}
-        <Controller
-          control={control}
+        {/* 🟢 INPUT DE EMPRESA con TanStack Form */}
+        <form.Field
           name="company"
-          rules={{ 
-            required: "La empresa es obligatoria",
-            // 🟢 NUEVO: Solo letras
-            pattern: {
-              value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-              message: "Solo se permiten letras"
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) return "La empresa es obligatoria";
+              if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value)) return "Solo se permiten letras";
+              return undefined;
             }
           }}
-          render={({ field: { onChange, value } }) => (
+          children={(field) => (
             <InputField
               label="Empresa *"
               placeholder="Nombre de la empresa"
-              value={value}
-              onChangeText={(text) => onChange(text.replace(/[0-9]/g, ''))} // 🟢 NUEVO: Bloquea números al escribir
-              error={errors.company?.message}
+              value={field.state.value}
+              onChangeText={(text) => field.handleChange(text.replace(/[0-9]/g, ''))}
+              error={field.state.meta.errors ? field.state.meta.errors.join(', ') : undefined}
             />
           )}
         />
 
-        {/* 🟢 INPUT DE CARGO */}
-        <Controller
-          control={control}
+        {/* 🟢 INPUT DE CARGO con TanStack Form */}
+        <form.Field
           name="position"
-          rules={{ 
-            required: "El cargo es obligatorio",
-            // 🟢 NUEVO: Solo letras
-            pattern: {
-              value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-              message: "Solo se permiten letras"
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) return "El cargo es obligatorio";
+              if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(value)) return "Solo se permiten letras";
+              return undefined;
             }
           }}
-          render={({ field: { onChange, value } }) => (
+          children={(field) => (
             <InputField
               label="Cargo *"
               placeholder="Tu posición"
-              value={value}
-              onChangeText={(text) => onChange(text.replace(/[0-9]/g, ''))} // 🟢 NUEVO: Bloquea números
-              error={errors.position?.message}
+              value={field.state.value}
+              onChangeText={(text) => field.handleChange(text.replace(/[0-9]/g, ''))}
+              error={field.state.meta.errors ? field.state.meta.errors.join(', ') : undefined}
             />
           )}
         />
 
-        {/* 🟢 AQUÍ USAMOS NUESTRO NUEVO CALENDARIO PARA FECHA DE INICIO */}
-        <Controller
-          control={control}
+        {/* 🟢 CALENDARIO PARA FECHA DE INICIO con TanStack Form */}
+        <form.Field
           name="startDate"
-          rules={{ required: "La fecha de inicio es obligatoria" }}
-          render={({ field: { onChange, value } }) => (
+          validators={{
+            onChange: ({ value }) => {
+              if (!value) return "La fecha de inicio es obligatoria";
+              return undefined;
+            }
+          }}
+          children={(field) => (
             <DatePickerField
               label="Fecha de Inicio *"
               placeholder="Toca para elegir una fecha"
-              value={value} // El valor que se muestra en pantalla
-              onChangeText={onChange} // Guarda la fecha cuando se elige
-              error={errors.startDate?.message}
+              value={field.state.value}
+              onChangeText={field.handleChange}
+              error={field.state.meta.errors ? field.state.meta.errors.join(', ') : undefined}
             />
           )}
         />
 
         {/* 🟢 CALENDARIO PARA FECHA DE FIN (Este no es obligatorio) */}
-        <Controller
-          control={control}
+        <form.Field
           name="endDate"
-          render={({ field: { onChange, value } }) => (
+          children={(field) => (
             <DatePickerField
               label="Fecha de Fin"
               placeholder="Déjalo vacío si es tu trabajo actual"
-              value={value}
-              onChangeText={onChange}
+              value={field.state.value}
+              onChangeText={field.handleChange}
             />
           )}
         />
 
-        {/* 🟢 INPUT DE DESCRIPCIÓN */}
-        <Controller
-          control={control}
+        {/* 🟢 INPUT DE DESCRIPCIÓN con TanStack Form */}
+        <form.Field
           name="description"
-          render={({ field: { onChange, value } }) => (
+          children={(field) => (
             <InputField
               label="Descripción"
               placeholder="Describe tus responsabilidades..."
-              value={value}
-              onChangeText={onChange}
+              value={field.state.value}
+              onChangeText={field.handleChange}
               multiline
               numberOfLines={4}
               style={{ height: 100, textAlignVertical: "top" }}
@@ -140,10 +142,10 @@ export default function ExperienceScreen() {
           )}
         />
 
-        {/* 🟢 EL BOTÓN EJECUTA handleSubmit DE REACT HOOK FORM */}
-        <NavigationButton title="Agregar Experiencia" onPress={handleSubmit(onSubmit)} />
+        {/* 🟢 EL BOTÓN EJECUTA handleSubmit DE TANSTACK FORM */}
+        <NavigationButton title="Agregar Experiencia" onPress={form.handleSubmit} />
 
-        {/* LISTA DE EXPERIENCIAS YA AGREGADAS (Esto se mantiene igual) */}
+        {/* LISTA DE EXPERIENCIAS YA AGREGADAS */}
         {cvData.experiences.length > 0 && (
           <>
             <Text style={styles.listTitle}>Experiencias Agregadas</Text>

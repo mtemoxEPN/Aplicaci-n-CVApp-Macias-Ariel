@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { useCVContext } from "../context/CVContext";
 import { colors, spacing, borderRadius, fontSize, fontWeight, shadows } from "../src/theme";
@@ -12,9 +12,10 @@ export default function HomeScreen() {
     cvData.personalInfo.fullName && cvData.personalInfo.email;
   const hasExperience = cvData.experiences.length > 0;
   const hasEducation = cvData.education.length > 0;
+  const hasSkills = cvData.skills.length > 0;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Image
           source={require("../assets/epn-logo.png")}
@@ -83,6 +84,26 @@ export default function HomeScreen() {
             <Text style={styles.stepButtonText}>→</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.stepCard}>
+          <View style={[styles.stepNumber, hasSkills && styles.stepComplete]}>
+            <Text style={styles.stepNumberText}>{hasSkills ? "✓" : "4"}</Text>
+          </View>
+          <View style={styles.stepContent}>
+            <Text style={styles.stepTitle}>Habilidades</Text>
+            <Text style={styles.stepStatus}>
+              {hasSkills
+                ? `${cvData.skills.length} habilidad(es)`
+                : "Pendiente"}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.stepButton}
+            onPress={() => router.push("/skills")}
+          >
+            <Text style={styles.stepButtonText}>→</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.previewContainer}>
@@ -93,13 +114,12 @@ export default function HomeScreen() {
           <Text style={styles.previewButtonText}>Ver Vista Previa</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: colors.ui.background,
   },
   header: {

@@ -20,8 +20,14 @@ export interface Education {
     field: string;
     graduationYear: string;
 }
+export interface Skill {
+    id: string;
+    name: string;
+    level: 'Básico' | 'Intermedio' | 'Avanzado' | 'Experto';
+}
 export interface CVData {
     personalInfo: PersonalInfo;
     experience: Experience[];
     education: Education[];
+    skills: Skill[];
 }

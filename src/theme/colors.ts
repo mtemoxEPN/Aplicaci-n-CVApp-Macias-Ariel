@@ -30,6 +30,12 @@ export const colors = {
     background: '#C8102E',
     tint: '#FFFFFF',
   },
+  levels: {
+    basic: '#8E8E93',
+    intermediate: '#003087',
+    advanced: '#FFD100',
+    expert: '#C8102E',
+  },
 } as const;
 
 export type Colors = typeof colors;

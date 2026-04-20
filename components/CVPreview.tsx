@@ -16,7 +16,16 @@ const LogoEpn = () => (
 );
 
 export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
-  const { personalInfo, experiences, education } = cvData;
+  const { personalInfo, experiences, education, skills } = cvData;
+
+  const getLevelColor = (level: string) => {
+    switch (level) {
+      case 'Básico': return colors.levels.basic;
+      case 'Intermedio': return colors.levels.intermediate;
+      case 'Avanzado': return colors.levels.advanced;
+      case 'Experto': return colors.levels.expert;
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -98,10 +107,26 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
           </View>
         )}
 
+        {/* Habilidades */}
+        {skills.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>HABILIDADES TÉCNICAS</Text>
+            <View style={styles.skillsContainer}>
+              {skills.map((skill) => (
+                <View key={skill.id} style={[styles.skillBadge, { backgroundColor: getLevelColor(skill.level) + '20', borderColor: getLevelColor(skill.level) }]}>
+                  <Text style={[styles.skillName]}>{skill.name}</Text>
+                  <Text style={[styles.skillLevel, { color: getLevelColor(skill.level) }]}>{skill.level}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Mensaje si no hay datos */}
         {!personalInfo.fullName &&
           experiences.length === 0 &&
-          education.length === 0 && (
+          education.length === 0 &&
+          skills.length === 0 && (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>
                 No hay información para mostrar.{"\n"}
@@ -215,6 +240,29 @@ const styles = StyleSheet.create({
     fontSize: fontSize.caption,
     color: colors.ui.textPrimary,
     lineHeight: 18,
+  },
+  skillsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  skillBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: 20,
+    borderWidth: 1,
+    gap: spacing.sm,
+  },
+  skillName: {
+    fontSize: fontSize.subhead,
+    fontWeight: fontWeight.semibold,
+    color: colors.ui.textPrimary,
+  },
+  skillLevel: {
+    fontSize: fontSize.caption,
+    fontWeight: fontWeight.medium,
   },
   emptyState: {
     flex: 1,
