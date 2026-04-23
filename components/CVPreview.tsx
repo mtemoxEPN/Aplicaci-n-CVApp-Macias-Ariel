@@ -1,3 +1,5 @@
+// components/CVPreview.tsx
+
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { CVData } from "../types/cv.types";
@@ -16,6 +18,7 @@ const LogoEpn = () => (
 );
 
 export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
+  // 🟢 Extraemos la foto de personalInfo
   const { personalInfo, experiences, education, skills } = cvData;
 
   const getLevelColor = (level: string) => {
@@ -34,11 +37,24 @@ export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
         <Text style={styles.epnLabel}>EPN</Text>
       </View>
       <View style={styles.content}>
-        {/* Header con información personal */}
+        
+        {/* Header con información personal y FOTO */}
         <View style={styles.header}>
-          <Text style={styles.name}>
-            {personalInfo.fullName || "Tu Nombre"}
-          </Text>
+          <View style={styles.headerTopRow}>
+            {/* 🟢 Renderizamos la foto si existe */}
+            {personalInfo.profileImage && (
+              <Image 
+                source={{ uri: personalInfo.profileImage }} 
+                style={styles.profileImage} 
+              />
+            )}
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>
+                {personalInfo.fullName || "Tu Nombre"}
+              </Text>
+            </View>
+          </View>
+
           <View style={styles.contactInfo}>
             {personalInfo.email && (
               <View style={styles.contactRow}>
@@ -151,8 +167,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary.red,
   },
   logo: {
-    width: 300,
-    height: 200,
+    width: 250,
+    height: 100,
   },
   epnLabel: {
     fontSize: fontSize.caption,
@@ -170,11 +186,26 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     marginBottom: spacing['2xl'],
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    gap: spacing.lg,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: colors.primary.red,
+  },
+  nameContainer: {
+    flex: 1,
+  },
   name: {
-    fontSize: fontSize.largeTitle,
+    fontSize: fontSize.title1,
     fontWeight: fontWeight.bold,
     color: colors.ui.textPrimary,
-    marginBottom: spacing.md,
   },
   contactInfo: {
     gap: spacing.sm,

@@ -31,3 +31,13 @@ export interface CVData {
     education: Education[];
     skills: Skill[];
 }
+
+// PARA LAS IMÁGENES
+export interface PersonalInfo {
+    fullName: string;
+    email: string;
+    phone: string;
+    location: string;
+    summary: string;
+    profileImage?: string; // 🟢 NUEVO CAMPO AÑADIDO
+}

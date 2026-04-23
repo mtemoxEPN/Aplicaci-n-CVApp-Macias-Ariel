@@ -1,17 +1,43 @@
 import { CVData } from '../types/cv.types';
 
-// 🟢 1. Se exporta la función para que pueda ser utilizada tanto por la pantalla visual como por el archivo de pruebas.
 export const generateCVHtml = (cvData: CVData) => {
     const { personalInfo, experiences, education, skills } = cvData;
+
+    // 🟢 1. Generamos el bloque de la imagen solo si el usuario seleccionó una foto
+    const profileImageHtml = personalInfo.profileImage 
+        ? `<img src="${personalInfo.profileImage}" class="profile-img" />` 
+        : '';
 
     return `
         <html>
             <head>
                 <style>
                     body { font-family: 'Helvetica', sans-serif; padding: 20px; color: #333; }
-                    .header { border-bottom: 2px solid #C41E3A; padding-bottom: 10px; margin-bottom: 20px; }
-                    .name { font-size: 28px; font-weight: bold; color: #000; margin: 0; }
-                    .section-title { color: #C41E3A; font-size: 18px; font-weight: bold; margin-top: 20px; text-transform: uppercase; }
+                    
+                    /* 🟢 2. Cambiamos el header para que la foto y el texto se alineen horizontalmente */
+                    .header { 
+                        display: flex; 
+                        align-items: center; 
+                        border-bottom: 2px solid #C41E3A; 
+                        padding-bottom: 20px; 
+                        margin-bottom: 20px; 
+                    }
+                    
+                    /* 🟢 3. Estilos redondos para la foto del PDF */
+                    .profile-img {
+                        width: 100px;
+                        height: 100px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        margin-right: 20px;
+                        border: 3px solid #C41E3A;
+                    }
+                    
+                    .header-info { flex: 1; }
+                    .name { font-size: 28px; font-weight: bold; color: #000; margin: 0 0 8px 0; }
+                    .contact-text { margin: 0 0 4px 0; color: #555; font-size: 14px; }
+                    
+                    .section-title { color: #C41E3A; font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; text-transform: uppercase; }
                     .item { margin-bottom: 15px; }
                     .item-title { font-weight: bold; font-size: 14px; }
                     .item-date { color: #666; font-size: 12px; }
@@ -21,9 +47,12 @@ export const generateCVHtml = (cvData: CVData) => {
             </head>
             <body>
                 <div class="header">
-                    <h1 class="name">${personalInfo.fullName || 'Sin Nombre'}</h1>
-                    <p>${personalInfo.email} | ${personalInfo.phone}</p>
-                    <p>${personalInfo.location}</p>
+                    ${profileImageHtml}
+                    <div class="header-info">
+                        <h1 class="name">${personalInfo.fullName || 'Sin Nombre'}</h1>
+                        <p class="contact-text">✉ ${personalInfo.email} | ☎ ${personalInfo.phone}</p>
+                        <p class="contact-text">📍 ${personalInfo.location}</p>
+                    </div>
                 </div>
 
                 <div class="section-title">Resumen Profesional</div>

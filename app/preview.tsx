@@ -1,26 +1,20 @@
+// app/preview.tsx
+
 import React from 'react';
-import { 
-    View,
-    StyleSheet,
-    Alert
- } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useCVContext } from '../context/CVContext';
 import { CVPreview } from '@/components/CVPreview';
 import { NavigationButton } from '../components/NavigationButton';
-// 🟢 2. Se importa la función externa para generar el documento.
 import { generateCVHtml } from '../utils/pdfGenerator';
-
-// 🟢 1. Se importan las librerías para la gestión de documentos y el envío de archivos.
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
 export default function PreviewScreen() {
+    // 🟢 AQUÍ ESTÁ LA CLAVE: Estamos jalando los datos actualizados del contexto global
     const { cvData } = useCVContext();
 
-    // 🟢 3. El método ejecuta la transformación del contenido visual a un archivo de formato PDF.
     const handleExportPDF = async () => {
         try {
-            // 🟢 3. Se utiliza la función externa pasándole los datos actuales del contexto.
             const { uri } = await Print.printToFileAsync({
                 html: generateCVHtml(cvData), 
             });
@@ -44,9 +38,9 @@ export default function PreviewScreen() {
 
     return (
         <View style={styles.container}>
+            {/* 🟢 Le pasamos esos datos actualizados (que ya deberían incluir la foto) al componente visual */}
             <CVPreview cvData={cvData} />
             
-            {/* 🟢 5. El componente de botón inicia el proceso de creación y distribución del documento final. */}
             <View style={styles.buttonContainer}>
                 <NavigationButton 
                     title="Exportar y Compartir PDF" 

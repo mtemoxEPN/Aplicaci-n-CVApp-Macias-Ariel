@@ -25,6 +25,7 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       phone: "",
       location: "",
       summary: "",
+      profileImage: undefined, // 🟢 NUEVO VALOR INICIAL
     },
     experiences: [],
     education: [],

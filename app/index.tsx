@@ -3,13 +3,15 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "rea
 import { useRouter } from "expo-router";
 import { useCVContext } from "../context/CVContext";
 import { colors, spacing, borderRadius, fontSize, fontWeight, shadows } from "../src/theme";
+import { Ionicons } from '@expo/vector-icons'; // 🟢 Importamos los íconos para evitar emojis
 
 export default function HomeScreen() {
   const router = useRouter();
   const { cvData } = useCVContext();
 
-  const isPersonalInfoComplete =
-    cvData.personalInfo.fullName && cvData.personalInfo.email;
+  // 🟢 Nueva validación para saber si hay foto
+  const hasPhoto = !!cvData.personalInfo.profileImage;
+  const isPersonalInfoComplete = cvData.personalInfo.fullName && cvData.personalInfo.email;
   const hasExperience = cvData.experiences.length > 0;
   const hasEducation = cvData.education.length > 0;
   const hasSkills = cvData.skills.length > 0;
@@ -27,6 +29,34 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.stepsContainer}>
+        
+        {/* 🟢 NUEVA SECCIÓN: Foto de Perfil */}
+        <View style={styles.stepCard}>
+          <View style={[styles.stepNumber, hasPhoto && styles.stepComplete]}>
+            {hasPhoto && cvData.personalInfo.profileImage ? (
+              <Image 
+                source={{ uri: cvData.personalInfo.profileImage }} 
+                style={styles.thumbnail} 
+              />
+            ) : (
+              <Ionicons name="camera" size={20} color={colors.ui.surface} />
+            )}
+          </View>
+          <View style={styles.stepContent}>
+            <Text style={styles.stepTitle}>Foto de Perfil</Text>
+            <Text style={styles.stepStatus}>
+              {hasPhoto ? "✓ Agregada" : "Opcional"}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.stepButton}
+            onPress={() => router.push("/photo")}
+          >
+            <Text style={styles.stepButtonText}>→</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sección 1: Información Personal */}
         <View style={styles.stepCard}>
           <View style={[styles.stepNumber, isPersonalInfoComplete && styles.stepComplete]}>
             <Text style={styles.stepNumberText}>{isPersonalInfoComplete ? "✓" : "1"}</Text>
@@ -45,6 +75,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Sección 2: Experiencia Laboral */}
         <View style={styles.stepCard}>
           <View style={[styles.stepNumber, hasExperience && styles.stepComplete]}>
             <Text style={styles.stepNumberText}>{hasExperience ? "✓" : "2"}</Text>
@@ -65,6 +96,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Sección 3: Educación */}
         <View style={styles.stepCard}>
           <View style={[styles.stepNumber, hasEducation && styles.stepComplete]}>
             <Text style={styles.stepNumberText}>{hasEducation ? "✓" : "3"}</Text>
@@ -85,6 +117,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Sección 4: Habilidades */}
         <View style={styles.stepCard}>
           <View style={[styles.stepNumber, hasSkills && styles.stepComplete]}>
             <Text style={styles.stepNumberText}>{hasSkills ? "✓" : "4"}</Text>
@@ -129,8 +162,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   logo: {
-    width: 500,
-    height: 200,
+    width: 300,
+    height: 120, // 🟢 Ajusté un poco el alto para que la pantalla respire mejor
     marginBottom: spacing.md,
   },
   title: {
@@ -164,6 +197,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
+    overflow: 'hidden', // 🟢 Importante para que la foto no se salga del círculo
+  },
+  thumbnail: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
   stepComplete: {
     backgroundColor: colors.primary.red,
@@ -202,6 +241,7 @@ const styles = StyleSheet.create({
   previewContainer: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing['2xl'],
+    paddingBottom: spacing['4xl'], // 🟢 Espacio extra al final para scroll
   },
   previewButton: {
     backgroundColor: colors.primary.blue,
@@ -215,4 +255,3 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.semibold,
   },
 });
-

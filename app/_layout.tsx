@@ -31,6 +31,12 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen 
+          name="photo" 
+          options={{ 
+            title: 'Foto de Perfil', 
+          }} 
+        />
+        <Stack.Screen 
           name="experience" 
           options={{ 
             title: 'Información Laboral', 
